@@ -52,22 +52,22 @@ type du nœud on convient d’utiliser
 • 3 pour un nœud avec 2 fils
 */
 
-Arbre construitArbQuelconque() {
-	/*construit un arbre quelconque décrit par son parcours en profondeur*/
+Arbre litArbQuelconque() {
+	/*construit un arbre quelconque décrit par son parcours en profondeur par l'utilisateur*/
 	int fils=0, etiquette=0;
 	Arbre a = NULL;
 	scanf("%d",&fils);
 	scanf("%d",&etiquette);
 	a = alloueArbre(etiquette);
 	if (fils == 1 || fils == 3) 
-		a-> fg = construitArbQuelconque(a->fg);
+		a-> fg = litArbQuelconque();
 	if (fils == 2 || fils == 3) 
-		a-> fd = construitArbQuelconque(a->fd);
+		a-> fd = litArbQuelconque();
 	/*if (fils == 0) inutile : cas par défaut*/
 	return a;
 }
 
-void ecritArbreQuelconque(Arbre a) {
+void afficheArbreQuelconque(Arbre a) {
 	/*affiche le parcours en profondeur de l'arbre quelconque a*/
 	if (a != NULL) {
 		if (a->fg == NULL && a->fd == NULL)
@@ -79,22 +79,74 @@ void ecritArbreQuelconque(Arbre a) {
 		if (a->fg != NULL && a->fd != NULL)
 			printf("3 ");
 		printf("%d ",a->valeur);
-		ecritArbreQuelconque(a->fg);
-		ecritArbreQuelconque(a->fd);
+		afficheArbreQuelconque(a->fg);
+		afficheArbreQuelconque(a->fd);
+	}
+}
+
+
+
+
+
+Arbre construitArbQuelconque(FILE *in) {
+	/*construit un arbre quelconque décrit par son parcours en profondeur dans le fichier*/
+	int fils=0, etiquette=0;
+	Arbre a = NULL;
+	if (fscanf(in, "%d", &fils) != EOF) {
+		if (fscanf(in, "%d", &etiquette)) {
+			a = alloueArbre(etiquette);
+			if (fils == 1 || fils == 3) 
+				a-> fg = construitArbQuelconque(in);
+			if (fils == 2 || fils == 3) 
+				a-> fd = construitArbQuelconque(in);
+			/*if (fils == 0) inutile : cas par défaut*/
+		}
+	}
+	return a;
+}
+
+void ecritArbreQuelconque(Arbre a, FILE* out) {
+	/*ecrit le parcours en profondeur de l'arbre quelconque a dans le fichier*/
+	if (a != NULL) {
+		if (a->fg == NULL && a->fd == NULL)
+			fprintf(out, "0 ");
+		if (a->fg != NULL && a->fd == NULL)
+			fprintf(out, "1 ");
+		if (a->fg == NULL && a->fd != NULL)
+			fprintf(out, "2 ");
+		if (a->fg != NULL && a->fd != NULL)
+			fprintf(out, "3 ");
+		fprintf(out, "%d ", a->valeur);
+		ecritArbreQuelconque(a->fg, out);
+		ecritArbreQuelconque(a->fd, out);
 	}
 }
 
 int main () {
 
+	FILE *in = NULL;
+	FILE *out = NULL;
+	in = fopen("ArbreIn", "r");
+	out = fopen("ArbreOut", "w");
+
+	Arbre tmp1 = NULL;
+	printf("lecture du fichier d'entrée\n");
+	tmp1 = construitArbQuelconque(in);
+	printf("\n votre arbre s'ecrit dans le fichier de sortie\n");
+	ecritArbreQuelconque(tmp1, out);
+	printf("\n et le voici joliment déssiné :) : \n");
+	afficheArbJoli(tmp1,0);
+
+	fclose(in);
+	fclose(out);
+
 	Arbre tmp = NULL;
 	printf("construisez un arbre\n");
-	tmp = construitArbQuelconque();
+	tmp = litArbQuelconque();
 	printf("\n voici votre arbre : \n");
-	ecritArbreQuelconque(tmp);
+	afficheArbreQuelconque(tmp);
 	printf("\n et le voici joliment déssiné :) : \n");
 	afficheArbJoli(tmp,0);
 
-	
-
-return 0;
+	return 0;
 }

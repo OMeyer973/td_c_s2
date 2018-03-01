@@ -111,7 +111,7 @@ int nbNoeudsAvec2Fils (Arbre a) {
 }
 
 void afficheArbPositif(Arbre a) {
-	/*affiche le parcours infixe de l'arbre positif a*/
+	/*affiche le parcours prefixe de l'arbre positif a*/
 	if (a == NULL)
 		printf("0 ");
 	else {
@@ -137,7 +137,7 @@ void afficheArbJoli(Arbre a, int niv) {
 }
 
 Arbre construitArbPositif() {
-	/*construit un arbre décrit par son parcours infixe*/
+	/*construit un arbre décrit par son parcours prefixe (entrées utilisateur)*/
 	int n;
 	Arbre a = NULL;
 	scanf("%d",&n);
