@@ -93,7 +93,7 @@ Arbre construitArbQuelconque(FILE *in) {
 	int fils=0, etiquette=0;
 	Arbre a = NULL;
 	if (fscanf(in, "%d", &fils) != EOF) {
-		if (fscanf(in, "%d", &etiquette)) {
+		if (fscanf(in, "%d", &etiquette) != EOF) {
 			a = alloueArbre(etiquette);
 			if (fils == 1 || fils == 3) 
 				a-> fg = construitArbQuelconque(in);

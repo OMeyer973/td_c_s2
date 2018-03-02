@@ -122,6 +122,8 @@ void afficheArbPositif(Arbre a) {
 }
 
 void afficheArbJoli(Arbre a, int niv) {
+	/* affiche l'arbre a sous la forme d'une arborescence (fg en haut, fd en bas)
+	Pour appeller le dessin de l'arbre a, taper afficherArbJoli(a,0); */
 	int i = 0;
 	for (i=0; i<niv; i++) {
 		printf("|   ");

@@ -90,6 +90,31 @@ void insereDansABRIteratif (Arbre* a, int x) {
     }
 }
 
+int getMinABR (Arbre a) {
+   /*renvoie le min de l'abr*/
+    if (a == NULL) {
+        fprintf(stderr, "l'arbre est NULL\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    while (a->fg != NULL) 
+        a = a->fg;
+
+    return a->valeur;
+}
+
+int getMaxABR (Arbre a) {
+   /*renvoie le max de l'abr*/
+    if (a == NULL) {
+        fprintf(stderr, "l'arbre est NULL\n");
+        exit(EXIT_FAILURE);
+    }
+
+    while (a->fd != NULL) 
+        a = a->fd;
+
+    return a->valeur;
+}
 
 Arbre oterMin (Arbre* a) {
     /*retire le max de l'arbre a et renvois l'adresse du noeud retiré privé de ses fils*/
@@ -102,13 +127,13 @@ Arbre oterMin (Arbre* a) {
     while ((*tmp)->fg != NULL) 
         tmp = &(*tmp)->fg;
 
-	/*on a trouvé le noeud a retiré !*/
+    /*on a trouvé le noeud a retiré !*/
     out = *tmp;
     
     if ((*tmp)->fd != NULL) /*si le noeud qui contenait le min a un fd, on le remplace par celui ci.(il ne peut pas avoir de fg car c'est le min)*/
-    	*tmp = (*tmp)->fd;
+        *tmp = (*tmp)->fd;
     else /*sinon on le supprime*/
-    	*tmp = NULL;
+        *tmp = NULL;
 
     /*On retire les fils du noeud retiré avant de le retourner pour éviter les éventuels problèmes d'utilisation futures*/
     out->fg = NULL;
@@ -206,111 +231,6 @@ Arbre retireDeABRIteratif (Arbre* a, int x) {
     return out;
 }
 
-
-int estABRFAUX (Arbre a) {
-    //retourne vrai si l'arbre passé en argument est un ABR
-    //!!! plus compliqué que ça !!! 
-    //on peut avoir fg < a < fd; fg ABR; fd ABR mais a non ABR
-    if (a == NULL)
-        return 1;
-        
-    if (a->fg != NULL && a->fg->valeur > a->valeur) 
-    	return 0;
-    if (a->fd != NULL && a->valeur > a->fd->valeur)
-        return 0;
-
-    return estABRFAUX(a->fd) && estABRFAUX(a->fd);
-}
-
-
-
-
-int estABRRecByLouisePete(Arbre a, int* minFd, int* maxFg) {
-    if (a == NULL)
-        return 1;
-
-    if (a->fg == NULL)
-        *maxFg = a->valeur;
-    else {
-        if (a->fg->valeur < *minFd && estABRRecByLouisePete(a->fg, minFd, maxFg))
-            return 1;
-    }
-
-    if (a->fd == NULL)
-        *minFd = a->valeur;
-    else {
-        if (a->fd->valeur < *maxFg && estABRRecByLouisePete(a->fd, minFd, maxFg))
-            return 1;
-    }
-    return 0;
-}
-
-int estABRByLouisePete (Arbre a) {
-    if (a == NULL)
-        return 1;
-
-    int minFd = a->valeur;
-    int maxFg = a->valeur;
-    return estABRRecByLouisePete(a, &minFd, &maxFg);
-}
-
-
-
-void swap(int* a, int*b) {
-    int tmp = *a;
-    *a = *b;
-    *b = tmp;
-}
-
-int estABR (Arbre a) {
-    /*methode naïve et pas faisable rapidement 
-    on peut avoir fg < a < fd; fg ABR; fd ABR; mais a non ABR
-    condition supplémentaire : max (fg) < min(fd) mais on est pas sûr que fg et fd sont des ABR : problème de temps pour trouver le min et max ...
-    */
-    /*methode 1 : parcours infixe et on verifie que les éléments retournés sont bien criossants
-    application : stocker le parcours infixe dans une liste chainée ou un tableau dynamique pour ensuite pouvoir vérifier l'ordre des éléments
-    */
-    /*methode 2 : un peu comme un parcours infixe mais on stocke un min et un max (mis à jour à mesure du percours) pour vérifier que chaque valeur du fd es > au max du fg et chaque valeur du fg est < au min du fd 
-    */
-    if (a == NULL)
-        return 1;
-
-    int minFd;
-    int maxFg;
-    return parcourInfixeTest(a, &minFd, &maxFg);
-}
-
-int parcourInfixeTest (Arbre a, int* prev, int* curr) {
-    /*teste si l'arbre est un abr (comparaison 2 à 2 des valeurs renvoyées par le marcours infixe)*/
-    /*je crois que ça marche*/
-    if (a == NULL)
-        return 1;
-
-    /*parcour*/
-    if (a->fg != NULL)
-        parcourInfixeTest(a->fg, prev, curr);
-
-    /*tests*/
-    if (prev == NULL)
-        *prev = a->valeur;
-
-    else if (curr == NULL)
-        *curr = a->valeur;
-    
-    else if (*prev > *curr) {
-        return 0;
-    }
-    else  {
-        swap(prev, curr);
-        *curr = a->valeur;
-    }
-    /*suite du parcour*/
-    if (a->fd != NULL)
-        parcourInfixeTest(a->fd, prev, curr);
-
-    return 1; /*on = 0 je sais pas trop ...*/
-}
-
 void parcourInfixe (Arbre a) {
     /*affiche le parcours infixe de l'arbre (tous les noeuds de gauche à droite)*/
     if (a == NULL)
@@ -321,6 +241,7 @@ void parcourInfixe (Arbre a) {
     if (a->fd != NULL)
         parcourInfixe(a->fd);
 }
+
 
 int main () {
 
@@ -339,34 +260,37 @@ int main () {
 	insereDansABRRecursif(&a,-5);
 	insereDansABRRecursif(&a,-9);
 	insereDansABRRecursif(&a,-6);
-	afficheArbJoli(a,0);
+	printf("l'arbre a : \n");
+    afficheArbJoli(a,0);
 
-	(estABR(a)) ? printf("a est un ABR (testé avec le cul) !") : printf("a n'est pas ABR (testé avec le cul) :(");
+    printf("min : %d\n", getMinABR(a));
+    printf("max : %d\n", getMaxABR(a));
 
-    printf("\n\n");
     parcourInfixe(a);
 	printf("\n\n");
-	/*
+	
 	Arbre b;
+    printf("recherche de 4 dans a :\n");
 	b = rechercheABRRecursif(a,4);
 	afficheArbJoli(b,0);
 
 	printf("\n\n");
+    printf("recherche de 5 dans a :\n");
 	b = rechercheABRIteratif(a,5);
 	afficheArbJoli(b,0);
-	*/
-
+	
+    printf("\n on retire des éléments de a :\n");
 	retireDeABRIteratif(&a,7);
 	retireDeABRIteratif(&a,0);
 	retireDeABRIteratif(&a,-600);
 	retireDeABRIteratif(&a,1);
-	printf("\nxxxxxxxxxxxx\n");
 	afficheArbJoli(a,0);
-	(estABR(a)) ? printf("a est un ABR !") : printf("a n'est pas ABR :(");
 
-    printf("\n\n");
+    printf("\nparcours infixe : ");
     parcourInfixe(a);
 	printf("\n\n");
 
-	return 0;
+
+    
+    return 0;
 }
