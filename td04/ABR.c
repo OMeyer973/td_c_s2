@@ -89,6 +89,19 @@ void parcourInfixe (Arbre a) {
         parcourInfixe(a->fd);
 }
 
+int hauteur (Arbre a) {
+    /*retourne la hauteur de l'arbre a*/
+    if (a == NULL)
+        return -1;
+    int hg = 0, hd = 0; /*hauteur gauche, hauteur droit*/
+    hg = hauteur(a->fg);
+    hd = hauteur(a->fd);
+    if (hg >= hd)
+        return 1 + hg;
+    else
+        return 1 + hd;
+}
+
 /*debut du tp*/
 /*////////////////////////////////////////////////////////*/
 
@@ -127,7 +140,7 @@ int estABRByLouisePete (Arbre a) {
 */
 
 
-int estABRInfixe (Arbre a, int* prev, int* curr) {
+int estABRInfixeRec (Arbre a, int* prev, int* curr) {
     /*fonction récursive de la fonction qui teste si l'arbre est un abr (comparaison 2 à 2 des valeurs renvoyées par le parcours infixe)*/
     /*je crois que ça marche*/
     if (a == NULL)
@@ -137,7 +150,7 @@ int estABRInfixe (Arbre a, int* prev, int* curr) {
 
     /*test fg*/
     if (a->fg != NULL)
-        out = estABRInfixe(a->fg, prev, curr);
+        out = estABRInfixeRec(a->fg, prev, curr);
 
     /*test racine*/
     if (*prev > *curr)
@@ -149,7 +162,7 @@ int estABRInfixe (Arbre a, int* prev, int* curr) {
 
     /*test fd*/
     if (a->fd != NULL)
-        out = out && estABRInfixe(a->fd, prev, curr);
+        out = out && estABRInfixeRec(a->fd, prev, curr);
 
     return out;
 }
@@ -158,7 +171,7 @@ int estABRInfixe (Arbre a, int* prev, int* curr) {
 int estABR (Arbre a) {
     /*methode naïve  
     on peut avoir fg < a < fd; fg ABR; fd ABR; mais a non ABR
-    condition supplémentaire : max (fg) < min(fd) mais on est pas sûr que fg et fd sont des ABR
+    condition supplémentaire : max (fg) < min(fd)
     */
     /*methode 1 : méthode naïve mais corrigée : on stocke un min et un max (mis à jour à mesure du percours) pour vérifier que chaque valeur du fd es > au max du fg et chaque valeur du fg est < au min du fd 
     */
@@ -172,35 +185,40 @@ int estABR (Arbre a) {
     int minFd, maxFg;
     minFd = maxFg = getMinABR(a);
 
-    return estABRInfixe(a, &minFd, &maxFg);
+    return estABRInfixeRec(a, &minFd, &maxFg);
 }
 
+void afficheChemin(int* chemin, int hauteur) {
+    /*affiche le chemin chemin jusqu'à la hauteur donnée (affiche les "hauteur" premiers éléments de la liste "chemin")*/
+    int i = 0;
+    for (i=0; i<=hauteur; i++) {
+        printf("%d ", chemin[i]);
+    }
+    printf("\n");
+}
 
-void afficheCheminsDesFeuilles(Arbre a, char* str) {
-
-    /*affiche les chemins de toutes les feuilles de l'arbre codé comme de al merde*/
-    char* currStr;
-    strcpy(currStr, str);
+void cheminsDesFeuillesRec(Arbre a, int* chemin, int hauteur) {
+    /*fonction récursive affiche les chemins de toutes les feuilles de l'arbre*/
     
     if (a == NULL)
         return;
     
-    strcat(currStr, " ");
-    char* tmp;
-    sprintf(tmp, "%d", a->valeur);
-    strcat(currStr, tmp);
+    chemin[hauteur] = a->valeur;
 
     if (a->fg != NULL)
-        afficheCheminsDesFeuilles(a->fg, currStr);
+        cheminsDesFeuillesRec(a->fg, chemin, hauteur + 1);
     
     if (a->fd != NULL)
-        afficheCheminsDesFeuilles(a->fd, currStr);
+        cheminsDesFeuillesRec(a->fd, chemin, hauteur + 1);
     
     if (a->fd == NULL && a->fg == NULL)
-        printf("%s \n",currStr);
+        afficheChemin(chemin, hauteur);
 }
 
-
+void afficheCheminsDesFeuilles(Arbre a) {
+    int chemin[hauteur(a)];
+    cheminsDesFeuillesRec (a, chemin, 0);
+}
 
 
 int main () {
@@ -228,8 +246,9 @@ int main () {
     parcourInfixe(a);
 	printf("\n\n");
 
-    afficheCheminsDesFeuilles(a,"");
-
+    printf("chemins de toutes les feuilles de l'arbre :\n");
+    afficheCheminsDesFeuilles(a);
+    printf("\n");
     Arbre b = alloueArbre(0);
     b->fg = alloueArbre(-1);
     b->fg->fd = alloueArbre(-2);
