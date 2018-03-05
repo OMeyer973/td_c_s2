@@ -9,7 +9,7 @@ typedef struct tnoeud {
     struct tnoeud* frd;
 } Tnoeud, *Tarbre;
 
-Tarbre alloueTarbre (char c) {
+Tarbre alloueTnoeud (char c) {
 /*alloue un espace mémoire à un arbre de valeur "val", fg NULL, fd NULL
 et et retourne son adresse*/
 	Tarbre tmp;
@@ -100,6 +100,82 @@ int nombreMots(Tarbre a) {
     return nombreMots(a->frg) + nombreMots(a->fils) + nombreMots(a->frd);
 }
 
+void ajouteMot(Tarbre* a, char* m) {
+    /*ajoute la chaine de caractères m dans l'arbre a*/
+    if (*a == NULL)
+        *a = alloueTnoeud(m[0]);
+
+    //frg
+    if (m[0] < (*a)->lettre)
+        return ajouteMot(&(*a)->frg, &m[0]);
+    //fils
+    if (m[0] == (*a)->lettre) {
+        if (m[0] == '\0')
+            return;
+        return ajouteMot(&(*a)->fils, &m[1]);
+    }
+    //frd
+    return ajouteMot(&(*a)->frd, &m[0]);
+}
+
+int hauteur(Tarbre a) {    
+/*retourne la hauteur du Tarbre a*/
+    if (a == NULL)
+        return -1;
+
+    int hg = 0, hf = 0, hd = 0; /*hauteur gauche, hauteur droit*/
+    hg = hauteur(a->frg);
+    hf = hauteur(a->fils);
+    hd = hauteur(a->frd);
+
+    /*hg est le plus haut*/
+    if (hg >= hf && hg >= hd)
+        return 1 + hg;
+    /*hf est le plus haut*/
+    else if (hf >= hg && hf >= hd)
+        return 1 + hf;
+    /*hd est le plus haut*/
+    else 
+        return 1 + hd;
+}
+
+
+void afficheMot(char* mot, int longueur) {
+    /*affiche le chemin chemin jusqu'à la hauteur donnée (affiche les "hauteur" premiers éléments de la liste "chemin")*/
+    int i = 0;
+    for (i=0; i<=longueur; i++) {
+            printf("%c", mot[i]);
+    }
+    printf("\n");
+}
+
+void afficheMotsRec(Tarbre a, char* motBuffer, int hauteur) {
+    /*fonction récursive affiche les chemins de toutes les feuilles de l'arbre*/
+    
+    if (a == NULL)
+        return;
+
+    //on arrive au bout d'un mot, alors on l'écrit (sans le \0)
+    if (a->lettre == '\0')
+         afficheMot(motBuffer, hauteur - 1);
+
+    //on écrit d'abord le mot stocké dans le frg (ordre lexico). on fait un appel récursif sans augmenter la hauteur (le frg n'est pas la suite du noeud courant, il faut donc remplacer le caractère courant) 
+    if (a->frg != NULL)
+        afficheMotsRec(a->frg, motBuffer, hauteur);
+
+    motBuffer[hauteur] = a->lettre;
+    
+    if (a->fils != NULL)
+        afficheMotsRec(a->fils, motBuffer, hauteur + 1);
+
+    if (a->frd != NULL)
+        afficheMotsRec(a->frd, motBuffer, hauteur); 
+}
+
+void afficheMots(Tarbre a) {
+    char motBuffer[hauteur(a)];
+    afficheMotsRec (a, motBuffer, 0);
+}
 
 
 
@@ -107,22 +183,22 @@ int main () {
 
     /*a : arbre contenant les mots {"le", "la", "de", "un", "une"} */
 	Tarbre a = NULL;
-    a = alloueTarbre('l');
+    a = alloueTnoeud('l');
     
-    a->frg = alloueTarbre('d');
-        a->frg->fils = alloueTarbre('e');
-            a->frg->fils->fils = alloueTarbre('\0');
+    a->frg = alloueTnoeud('d');
+        a->frg->fils = alloueTnoeud('e');
+            a->frg->fils->fils = alloueTnoeud('\0');
     
-    a->fils = alloueTarbre('e');
-        a->fils->frg = alloueTarbre('a');
-            a->fils->frg->fils = alloueTarbre('\0');
-        a->fils->fils = alloueTarbre('\0');
+    a->fils = alloueTnoeud('e');
+        a->fils->frg = alloueTnoeud('a');
+            a->fils->frg->fils = alloueTnoeud('\0');
+        a->fils->fils = alloueTnoeud('\0');
 
-    a->frd = alloueTarbre('u');
-        a->frd->fils = alloueTarbre('n');
-            a->frd->fils->fils = alloueTarbre('\0');
-                a->frd->fils->fils->frd = alloueTarbre('e');
-                    a->frd->fils->fils->frd->fils = alloueTarbre('\0');
+    a->frd = alloueTnoeud('u');
+        a->frd->fils = alloueTnoeud('n');
+            a->frd->fils->fils = alloueTnoeud('\0');
+                a->frd->fils->fils->frd = alloueTnoeud('e');
+                    a->frd->fils->fils->frd->fils = alloueTnoeud('\0');
     
     printf("l'arbre a : \n");
     afficheTarbJoli(a,0);
@@ -132,7 +208,28 @@ int main () {
     rechercheIt(a, str) ? printf("l'arbre contient \"%s\" (methode it)\n", str) : printf("l'arbre ne contient pas \"%s\"(methode it)\n", str);
 
     printf("nb mots de a : %d\n", nombreMots(a));
-    
+
+    char* motBonus = "lool";
+    printf("ajout du mot : %s\n", motBonus);
+    ajouteMot(&a, motBonus);
+    printf("l'arbre a avec le mot bonus : \n");
+    afficheTarbJoli(a,0);
+
+    printf("hauteur de a : %d\n",hauteur(a));
+    printf("mots de a rangés par ordre lexico : \n");
+    afficheMots(a);
+
+    /*
+    ajouteMot(&a, "des");
+    ajouteMot(&a, "destruction");
+    ajouteMot(&a, "aaa");
+    ajouteMot(&a, "zzz");
+    printf("l'arbre a avec pleins de mots en + : \n");
+    afficheTarbJoli(a,0);
+    printf("tous les mots :\n");
+    afficheMots(a);
+    */
+
     return 0;
 }
 
