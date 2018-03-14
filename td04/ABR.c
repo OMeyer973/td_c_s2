@@ -108,34 +108,34 @@ int hauteur (Arbre a) {
 
 
 /*
-//methode 1 mais implantation raté
-int estABRRecByLouisePete(Arbre a, int* minFd, int* maxFg) {
+//methode 1 mais implantation raté !!! ne marche pas !!!
+int estABRRec(Arbre a, int* minFd, int* maxFg) {
     if (a == NULL)
         return 1;
 
     if (a->fg == NULL)
         *maxFg = a->valeur;
     else {
-        if (a->fg->valeur < *minFd && estABRRecByLouisePete(a->fg, minFd, maxFg))
+        if (a->fg->valeur < *minFd && estABRRec(a->fg, minFd, maxFg))
             return 1;
     }
 
     if (a->fd == NULL)
         *minFd = a->valeur;
     else {
-        if (a->fd->valeur < *maxFg && estABRRecByLouisePete(a->fd, minFd, maxFg))
+        if (a->fd->valeur < *maxFg && estABRRec(a->fd, minFd, maxFg))
             return 1;
     }
     return 0;
 }
 
-int estABRByLouisePete (Arbre a) {
+int estABR(Arbre a) {
     if (a == NULL)
         return 1;
 
     int minFd = a->valeur;
     int maxFg = a->valeur;
-    return estABRRecByLouisePete(a, &minFd, &maxFg);
+    return estABRRec(a, &minFd, &maxFg);
 }
 */
 
