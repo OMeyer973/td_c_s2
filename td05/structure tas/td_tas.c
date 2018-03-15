@@ -48,10 +48,12 @@ indice du fils droit du noeud à la position i :
 14    13   
 
 
-notes : dans un arbre de hauteur h, les noeuds à la hauteur k sont les
+notes : dans un tas de n noeuds et de hauteur h, les noeuds à la hauteur k sont les
 [2^(k-1) , 2^(k+1)-1[ pour k < h-1
 [2^(h-1)-1, n[		  pour k = h-1
 */
+
+//todo : faire une jolie fonction d'affichage de l'arbre :D
 
 typedef struct {
 	int taille;
