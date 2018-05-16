@@ -95,7 +95,11 @@ int hachage(char* m) {
 
 int ajouteDico(Liste* liste, char* mot) {
 	/*ajoute le mot au dico si il n'y est pas, incrémente son occurence sinon*/
-	if (recherche(*liste, mot) > 0) {
+	printf("ajoutmot");
+	if (*liste == NULL) {
+		Liste listeTmp = alloueCellule(mot);
+		*liste = listeTmp;
+	}else if (recherche(*liste, mot) > 0) {
 		Liste prev = *liste;
 		while (prev != NULL) {
 			if (strcmp(prev->mot, mot) == 0) {
@@ -121,8 +125,6 @@ int nombreMots (Liste liste) {
 
 int main () {
 	Liste liste = NULL;
-	liste = alloueCellule("0");
-	/*problème si on commence avec une liste vide ...*/
 	
 	int i = 0;
 	

@@ -162,7 +162,7 @@ int estHG(Arbre a) {
 
 
 int main () {
-	/*arbre dessiné sur le sujet*/
+	/*arbre dessiné sur le sujet détaillé*/
 	Arbre h = NULL;
 	h = alloueArbre(1);
 	Arbre n = NULL;
